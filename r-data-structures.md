@@ -64,7 +64,7 @@ length(x)
 
 # Arrays
 
-Another data structure you'll have encountered in your math classes is the n-dimensional array. For the type of work that we'll be doing in this class, we'll mainly use arrays with two dimensions, which you're using to calling a matrix. A matrix in R is an array with two subscripts.
+Another data structure you'll have encountered in your math classes is the n-dimensional array. For the type of work that we'll be doing in this class, we'll mainly use arrays with two dimensions, which you're used to calling a matrix. A matrix in R is an array with two subscripts.
 
 You can create a matrix like this:
 
@@ -83,7 +83,7 @@ y.vector <- c(7.8, 1.1, 1.9, 6.4, 2.3)
 y.ts <- ts(y.vector, start=c(2024,6), frequency=12)
 ```
 
-In this example, `y.vector` is a vector with five elements. It could be time series or cross-sectional data. `y.ts` is a time series. It's a *compound data structure* because it holds multiple pieces of information inside one variable. In the case of a time series, it holds the data (`y.vector`) plus the frequency and the dates it covers. The fact that it holds the extra data is very helpful. You can take lags and differences of `y.ts` and R will properly add the appropriate time series properties to those transformations. You can add to time series together and R will properly align the dates for you.
+In this example, `y.vector` is a vector with five elements. It could be time series or cross-sectional data. `y.ts` is a time series. It's a *compound data structure* because it holds multiple pieces of information inside one variable. In the case of a time series, it holds the data (`y.vector`) plus the frequency (monthly) and the dates it covers (starting in June 2024). The fact that it holds the extra data is very helpful. You can take lags and differences of `y.ts` and R will properly add the appropriate time series properties to those transformations. You can add two time series together and R will properly align the dates for you.
 
 You'll get much practice with time series throughout the semester, but here's a motivating example:
 
@@ -106,7 +106,7 @@ One way to create a matrix time series is to use `cbind`:
 xx <- cbind(x1, x2)
 
 # xx has 24 rows
-# cbind does not delete any data. It as missing values as NA.
+# cbind does not delete any data. It sets missing values as NA.
 nrow(xx)
 
 # Type is mts
@@ -139,9 +139,9 @@ window(xs, start=c(2024,1))
 
 # Lists
 
-One reason R is different than other languages is because it is a dialect of Lisp, which dates back to the 1950s, and is the second oldest programming language behind Fortran. The name was originally spelled LISP, which stands for "list processor". As you might guess, that means lists are an important part of R.[^1]
+One reason R is different than other languages is because it is a dialect of Lisp, which dates back to the 1950s, and is the second oldest programming language after Fortran. The name was originally spelled LISP, which stands for "list processor". As you might guess, R being a dialect of Lisp means lists are an important part of R.[^1]
 
-In R, a list is a *heterogeneous data structure*. That just means you can store as many different types of information as you want in a list. An example of a list is the output of a linear regression. Among other things, you have the coefficient vector, the residuals (a vector, but with a longer length than the coefficient vector), the data used to do the regression (a matrix), and the regression formula (which is completely different from a vector or matrix). The list can hold any group of items, no matter how diverse.
+A list in R is a *heterogeneous data structure*. That means you can store as many different types of information as you want in a list. An example is the output of a linear regression. Among other things, you have the coefficient vector, the residuals (a vector, but with a longer length than the coefficient vector), the data used to do the regression (a matrix), and the regression formula (which is completely different from a vector or matrix). The list can hold all of these items and more, no matter how diverse they are. You can even store function definitions inside a list.
 
 [^1]: A bit of trivia. Herbert Simon, who won the 1978 Nobel Prize in economics, won the 1975 Turing Award (the equivalent of the Nobel Prize for computer science) for creating the linked list.
 
@@ -149,11 +149,11 @@ The official documentation for lists [is found here](https://cran.r-project.org/
 
 # Data Frames
 
-The most common way to store data in R is the *data frame*. A data frame is a list holding vectors with the same length or matrices with the same number of rows. Be forewarned that data frames confuse many new R users, at least the ones that have used other languages before using R. That's mostly because Lisp and list data structures are different from the approach of other popular programming languages.
+The most common way to store data in R is the *data frame*, which is a list holding vectors of the same length or matrices with the same number of rows. Be forewarned that data frames are confusing to many new R users, at least those that have used other languages before using R. That's because Lisp and list data structures are different from the approach taken by those other programming languages.
 
-If you are going to work with data frames in your own research, I encourage you to read about data frames. The official documentation [is here](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames).
+If you are going to work with data frames in your own research, I encourage you to read up on them. The official documentation [is here](https://cran.r-project.org/doc/manuals/r-release/R-intro.html#Data-frames).
 
-In general, we do not use data frames very often when doing time series analysis. The design of data frames, as lists with vectors of the same length, which makes them work so well for cross-sectional data, makes them basically useless for time series data. Let's take a look at what I mean.
+Having said that, you probably won't want to spend much time on data frames if you're doing time series anlysis. In general, we do not use data frames with time series data. The design of data frames, as lists with vectors of the same length, makes them work well for cross-sectional data, but makes them useless for time series data. Let's take a look at what I mean.
 
 Suppose we have these two annual time series, one starting in 1980 and one in 1981:
 
@@ -168,22 +168,22 @@ y2 <- ts(13:24, start=1981)
 y.df <- data.frame(y1, y2)
 ```
 
-You can create the data frame because a data frame converts `y1` and `y2` to vectors with length 12, which amounts to stripping off their time series properties. This isn't a problem of data frames. It just means they weren't designed to be used with time series data.
+You can create the data frame because `data.frame` converts `y1` and `y2` to vectors with length 12, which amounts to stripping off their time series properties. This doesn't mean data frames are doing things incorrectly. It just means they weren't designed to be used with time series data.
 
-There's a simple rule when working with time series: use ts or mts objects, and forget about data frames.
+There's a simple rule when working with time series: **use ts or mts objects, and forget about data frames**.
 
 # When You Can't Avoid Data Frames
 
 Unfortunately, you can't always avoid data frames. This is primarily an issue when you read in data. Whether you read data from a CSV file, an SQL database, or an Excel spreadsheet, the function will usually return a data frame.
 
-Fortunately, this is not much of a problem. You just need to read in the data and then add time series properties. Here's an example where we read in the price of gas from a CSV file. This data is downloaded from FRED. It has a header and two columns, the date and the national average gasoline price that month.
+Fortunately, this is not much of a problem. You just need to read in the data and then add time series properties. Here's an example where we read in the price of gas from a CSV file. The gasoline price data was downloaded from FRED. It has a header and two columns, the date (a string) in the first column and the national average gasoline price (a number) in the second column.
 
 ```
 gas.raw <- read.csv("https://raw.githubusercontent.com/bachmeil/datasets/refs/heads/main/gas.csv", header=TRUE)
 class(gas.raw)
 ```
 
-This is a data frame. As discussed above, that's useless for our purposes, because it can't track time series properties. Create a new ts variable with the right time series properties:
+`gas.raw` is a data frame. As discussed above, it's useless for our purposes, because it doesn't keep track of the time series properties. Create a new ts variable with the right time series properties:
 
 ```
 gas <- ts(gas.raw[,2], start=c(1991,2), frequency=12)
@@ -197,7 +197,7 @@ If you want a matrix, as in a plain matrix, with no time series properties, you 
 gas.matrix <- as.matrix(gas.raw)
 ```
 
-The catch is that since the first column is a string, it'll convert everything to a string. This makes sense, because in your mathematics classes, you only had elements that were numbers. What you need to do is slice off just the numerical parts of the data frame:
+The catch is that since the first column is a string, it'll convert everything to a string. This makes sense, because in your mathematics classes, you only had elements that were numbers. All the elements of a matrix have to be the same type. What you need to do is slice off just the numerical parts of the data frame:
 
 ```
 gas.matrix <- as.matrix(gas.raw[,2])
